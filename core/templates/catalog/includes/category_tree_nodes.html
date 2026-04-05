@@ -1,0 +1,43 @@
+<ul class="list-unstyled cat-tree-level mb-0">
+    {% for node in nodes %}
+        <li class="cat-tree-node">
+            <div class="d-flex flex-wrap align-items-center gap-2 py-1 cat-tree-row">
+                <span class="cat-tree-gutter d-inline-flex justify-content-center align-items-center flex-shrink-0">
+                    {% if node.tree_children %}
+                        <button class="btn btn-sm btn-link cat-tree-toggle p-0 text-body-secondary"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#cat-collapse-{{ node.pk }}"
+                                aria-expanded="true"
+                                aria-controls="cat-collapse-{{ node.pk }}"
+                                title="Expand or collapse">
+                            <i class="fa-solid fa-chevron-right cat-tree-chevron small"></i>
+                        </button>
+                    {% else %}
+                        <span class="cat-tree-leaf-dot text-muted" aria-hidden="true">·</span>
+                    {% endif %}
+                </span>
+                <span class="fw-semibold text-dark">{{ node.name }}</span>
+                <code class="small text-secondary">{{ node.slug }}</code>
+                {% if node.isActive %}
+                    <span class="badge text-bg-success">Active</span>
+                {% else %}
+                    <span class="badge text-bg-secondary">Inactive</span>
+                {% endif %}
+                <span class="text-muted small">#{{ node.sortOrder }}</span>
+                <div class="d-flex gap-1 ms-auto flex-shrink-0">
+                    <a href="{% url 'catalog:category-edit' node.pk %}"
+                       class="btn btn-sm btn-outline-primary rounded-pill px-3">Edit</a>
+                    <a href="{% url 'catalog:category-delete' node.pk %}"
+                       class="btn btn-sm btn-outline-danger rounded-pill px-3">Delete</a>
+                </div>
+            </div>
+            {% if node.tree_children %}
+                <div class="collapse show cat-tree-children ms-1 ps-2 border-start border-secondary-subtle"
+                     id="cat-collapse-{{ node.pk }}">
+                    {% include 'catalog/includes/category_tree_nodes.html' with nodes=node.tree_children %}
+                </div>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

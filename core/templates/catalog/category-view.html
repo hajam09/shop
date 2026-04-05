@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Categories{% endblock %}
+
+{% block extra_head %}
+{% include 'catalog/includes/category_page_styles.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="category-page container-fluid px-2 px-md-3">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item active" aria-current="page">Catalog</li>
+            <li class="breadcrumb-item active" aria-current="page">Categories</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex flex-column gap-4">
+        <div class="panel">
+            <div class="panel-head">
+                <h2 class="h5 mb-0 fw-semibold text-dark">
+                    <i class="fa-solid fa-plus text-primary me-2"></i>New category
+                </h2>
+                <p class="text-secondary small mb-0 mt-2">Choose a parent to nest under, or leave top level.</p>
+            </div>
+            <div class="panel-body">
+                <form method="post" action="" novalidate>
+                    {% csrf_token %}
+                    {% include 'catalog/includes/category_form_fields.html' with submit_label='Create category' %}
+                </form>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <h2 class="h4 mb-0 fw-semibold text-dark">
+                    <i class="fa-solid fa-sitemap text-primary me-2"></i>All categories
+                </h2>
+                <p class="text-secondary small mb-0 mt-2">Nested under parents; use the chevron to collapse or expand a branch.</p>
+            </div>
+            <div class="panel-body cat-tree-panel-body">
+                {% if category_roots %}
+                    {% include 'catalog/includes/category_tree_nodes.html' with nodes=category_roots %}
+                {% else %}
+                    <p class="text-secondary py-4 mb-0 text-center">No categories yet. Create one using the form above.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -67,6 +67,19 @@ class Category(BaseModel):
     isActive = models.BooleanField(default=True)
     sortOrder = models.PositiveIntegerField(default=0)
 
+    def __str__(self):
+        return self.name
+
+    def get_full_path(self):
+        parts = []
+        node = self
+        for _ in range(128):
+            if node is None:
+                break
+            parts.append(node.name)
+            node = node.parent if node.parent_id else None
+        return ' -> '.join(reversed(parts))
+
     class Meta:
         indexes = [models.Index(fields=['parent', 'sortOrder']), models.Index(fields=['slug'])]
 

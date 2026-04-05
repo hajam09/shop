@@ -1,0 +1,47 @@
+{% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+{% endif %}
+<div class="row g-3">
+    <div class="col-12 col-md-6">
+        <label for="{{ form.name.id_for_label }}" class="form-label">Name</label>
+        {{ form.name }}
+        {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors }}</div>{% endif %}
+    </div>
+    <div class="col-12 col-md-6">
+        <label for="{{ form.slug.id_for_label }}" class="form-label">Slug</label>
+        {{ form.slug }}
+        {% if form.slug.help_text %}<div class="form-text">{{ form.slug.help_text }}</div>{% endif %}
+        {% if form.slug.errors %}<div class="text-danger small">{{ form.slug.errors }}</div>{% endif %}
+    </div>
+</div>
+<div class="row g-3 mb-3">
+    <div class="col-12 col-md-6">
+        <label for="{{ form.parent.id_for_label }}" class="form-label">Parent</label>
+        {{ form.parent }}
+        {% if form.parent.errors %}<div class="text-danger small">{{ form.parent.errors }}</div>{% endif %}
+    </div>
+    <div class="col-12 col-md-6">
+        <label for="{{ form.sortOrder.id_for_label }}" class="form-label">Sort order</label>
+        {{ form.sortOrder }}
+        {% if form.sortOrder.errors %}
+            <div class="text-danger small">{{ form.sortOrder.errors }}</div>{% endif %}
+    </div>
+</div>
+<div class="mb-3">
+    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+    {{ form.description }}
+    {% if form.description.errors %}
+        <div class="text-danger small">{{ form.description.errors }}</div>{% endif %}
+</div>
+<div class="mb-4 form-check">
+    {{ form.isActive }}
+    <label class="form-check-label" for="{{ form.isActive.id_for_label }}">Active</label>
+    {% if form.isActive.errors %}
+        <div class="text-danger small">{{ form.isActive.errors }}</div>{% endif %}
+</div>
+<div class="d-flex flex-wrap gap-2 align-items-center">
+    <button type="submit" class="btn btn-primary rounded-pill px-4">{{ submit_label }}</button>
+    {% if cancel_url %}
+        <a class="btn btn-outline-secondary rounded-pill px-4" href="{{ cancel_url }}">Cancel</a>
+    {% endif %}
+</div>
