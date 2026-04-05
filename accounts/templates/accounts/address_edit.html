@@ -1,0 +1,58 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Edit address{% endblock %}
+
+{% block extra_head %}
+<style>
+    .address-edit-page {
+        --ae-accent: #2563eb;
+        --ae-accent-soft: rgba(37, 99, 235, 0.08);
+        --ae-card-border: rgba(15, 23, 42, 0.08);
+        max-width: 720px;
+        margin: 0 auto;
+    }
+    .address-edit-page .edit-panel {
+        border: 1px solid var(--ae-card-border);
+        border-radius: 1rem;
+        background: #fff;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    }
+    .address-edit-page .edit-panel .panel-head {
+        background: linear-gradient(180deg, var(--ae-accent-soft) 0%, #fff 100%);
+        border-bottom: 1px solid var(--ae-card-border);
+        padding: 1.1rem 1.35rem;
+    }
+    .address-edit-page .edit-panel .panel-body {
+        padding: 1.35rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="address-edit-page container-fluid px-2 px-md-3">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'accounts:address_book' %}" class="text-decoration-none">Saved addresses</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        </ol>
+    </nav>
+
+    <div class="edit-panel">
+        <div class="panel-head">
+            <h1 class="h4 mb-0 fw-semibold text-dark"><i class="fa-solid fa-pen-to-square text-primary me-2"></i>Edit address</h1>
+            <p class="text-secondary small mb-0 mt-2">Update details for {{ address.fullName }} — {{ address.city }}, {{ address.postcode }}</p>
+        </div>
+        <div class="panel-body">
+            <form method="post" action="" novalidate>
+                {% csrf_token %}
+                {% include 'accounts/includes/address_form_fields.html' %}
+                <div class="mt-4 pt-2 d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">Save changes</button>
+                    <a class="btn btn-outline-secondary rounded-pill px-4" href="{% url 'accounts:address_book' %}">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

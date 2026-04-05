@@ -1,0 +1,185 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Saved addresses{% endblock %}
+
+{% block extra_head %}
+<style>
+    .address-book-page {
+        --ab-accent: #2563eb;
+        --ab-accent-soft: rgba(37, 99, 235, 0.08);
+        --ab-surface: #f8fafc;
+        --ab-card-border: rgba(15, 23, 42, 0.08);
+        max-width: 1040px;
+        margin: 0 auto;
+    }
+    .address-book-page .page-hero {
+        background: linear-gradient(135deg, var(--ab-accent-soft) 0%, transparent 55%);
+        border: 1px solid var(--ab-card-border);
+        border-radius: 1rem;
+        padding: 1.75rem 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .address-book-page .page-hero h1 {
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #0f172a;
+    }
+    .address-book-page .address-card {
+        border: 1px solid var(--ab-card-border);
+        border-radius: 1rem;
+        overflow: hidden;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+        background: #fff;
+    }
+    .address-book-page .address-card:hover {
+        box-shadow: 0 12px 40px -12px rgba(15, 23, 42, 0.18);
+        transform: translateY(-2px);
+    }
+    .address-book-page .address-card .card-accent {
+        height: 4px;
+        background: linear-gradient(90deg, var(--ab-accent), #7c3aed);
+    }
+    .address-book-page .address-card .card-body-inner {
+        padding: 1.25rem 1.35rem 1rem;
+    }
+    .address-book-page .address-card address {
+        color: #475569;
+        line-height: 1.55;
+        font-style: normal;
+    }
+    .address-book-page .address-card .card-actions {
+        border-top: 1px solid var(--ab-card-border);
+        background: var(--ab-surface);
+        padding: 0.65rem 1rem;
+    }
+    .address-book-page .add-panel {
+        border: 1px solid var(--ab-card-border);
+        border-radius: 1rem;
+        background: #fff;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    }
+    .address-book-page .add-panel .panel-head {
+        background: linear-gradient(180deg, var(--ab-surface) 0%, #fff 100%);
+        border-bottom: 1px solid var(--ab-card-border);
+        padding: 1.1rem 1.35rem;
+    }
+    .address-book-page .add-panel .panel-body {
+        padding: 1.35rem;
+    }
+    .address-book-page .badge-type {
+        font-size: 0.65rem;
+        letter-spacing: 0.06em;
+        font-weight: 600;
+    }
+    .address-book-page .empty-state {
+        border: 1px dashed var(--ab-card-border);
+        border-radius: 1rem;
+        background: var(--ab-surface);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        color: #64748b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="address-book-page container-fluid px-2 px-md-3">
+    <div class="page-hero">
+        <div class="d-flex flex-wrap align-items-start gap-3 justify-content-between">
+            <div>
+                <h1 class="h3 mb-2"><i class="fa-solid fa-location-dot text-primary me-2"></i>Saved addresses</h1>
+                <p class="text-secondary mb-0">Shipping, billing, and returns — update or remove addresses anytime.</p>
+            </div>
+        </div>
+    </div>
+
+    {% if addresses %}
+        <div class="row g-4 mb-5">
+            {% for a in addresses %}
+                <div class="col-md-6">
+                    <div class="address-card h-100 d-flex flex-column shadow-sm">
+                        <div class="card-accent"></div>
+                        <div class="card-body-inner flex-grow-1 d-flex flex-column">
+                            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary border badge-type">{{ a.get_type_display }}</span>
+                                {% if a.isPrimary %}
+                                    <span class="badge bg-primary badge-type">Default</span>
+                                {% endif %}
+                            </div>
+                            <p class="fw-semibold text-dark mb-1 fs-6">{{ a.fullName }}</p>
+                            {% if a.phoneNumber %}
+                                <p class="small text-secondary mb-3"><i class="fa-solid fa-phone me-1 opacity-75"></i>{{ a.phoneNumber }}</p>
+                            {% endif %}
+                            <address class="small mb-0 flex-grow-1">
+                                {{ a.addressLine1 }}<br>
+                                {% if a.addressLine2 %}{{ a.addressLine2 }}<br>{% endif %}
+                                {% if a.addressLine3 %}{{ a.addressLine3 }}<br>{% endif %}
+                                {% if a.town %}{{ a.town }}<br>{% endif %}
+                                <span class="text-dark">{{ a.city }}</span>{% if a.county %}, {{ a.county }}{% endif %}{% if a.state %}, {{ a.state }}{% endif %}<br>
+                                <span class="fw-medium text-dark">{{ a.postcode }}</span><br>
+                                {{ a.get_country_display }}
+                            </address>
+                            {% if a.deliveryInstructions %}
+                                <p class="small text-secondary mb-0 mt-3 pt-3 border-top">
+                                    <span class="fw-semibold text-dark">Delivery notes</span><br>
+                                    {{ a.deliveryInstructions }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div class="card-actions d-flex flex-wrap gap-2 justify-content-end mt-auto">
+                            <a class="btn btn-sm btn-outline-secondary rounded-pill px-3" href="{% url 'accounts:address_edit' a.pk %}">
+                                <i class="fa-solid fa-pen me-1"></i>Edit
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#deleteAddressModal{{ a.pk }}">
+                                <i class="fa-regular fa-trash-can me-1"></i>Delete
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="deleteAddressModal{{ a.pk }}" tabindex="-1" aria-labelledby="deleteAddressLabel{{ a.pk }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow">
+                                <div class="modal-header border-0 pb-0">
+                                    <h2 class="modal-title h5" id="deleteAddressLabel{{ a.pk }}">Remove this address?</h2>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-secondary small">
+                                    <p class="mb-2">This cannot be undone. The following will be removed from your account:</p>
+                                    <p class="mb-0 fw-medium text-dark">{{ a.fullName }}, {{ a.city }}, {{ a.postcode }}</p>
+                                </div>
+                                <div class="modal-footer border-0 pt-0">
+                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                    <form method="post" action="{% url 'accounts:address_delete' a.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Delete address</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state mb-5">
+            <i class="fa-regular fa-map fa-2x mb-3 opacity-50"></i>
+            <p class="mb-0">You have not saved any addresses yet. Add one below to speed up checkout.</p>
+        </div>
+    {% endif %}
+
+    <div class="add-panel">
+        <div class="panel-head">
+            <h2 class="h5 mb-0 fw-semibold text-dark"><i class="fa-solid fa-plus-circle text-primary me-2"></i>Add a new address</h2>
+        </div>
+        <div class="panel-body">
+            <form method="post" action="" novalidate>
+                {% csrf_token %}
+                {% include 'accounts/includes/address_form_fields.html' %}
+                <div class="mt-4 pt-2">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4">Save address</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

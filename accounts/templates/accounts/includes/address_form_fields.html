@@ -1,0 +1,77 @@
+{% if form.non_field_errors %}
+    <div class="alert alert-danger mb-0">{{ form.non_field_errors }}</div>
+{% endif %}
+<div class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label fw-medium" for="{{ form.fullName.id_for_label }}">Full name</label>
+        {{ form.fullName }}
+        {% if form.fullName.errors %}<div class="invalid-feedback d-block small">{{ form.fullName.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-md-6">
+        <label class="form-label fw-medium" for="{{ form.phoneNumber.id_for_label }}">Phone <span class="text-secondary fw-normal small">(optional)</span></label>
+        {{ form.phoneNumber }}
+        {% if form.phoneNumber.errors %}<div class="invalid-feedback d-block small">{{ form.phoneNumber.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-12">
+        <label class="form-label fw-medium" for="{{ form.addressLine1.id_for_label }}">Address line 1</label>
+        {{ form.addressLine1 }}
+        {% if form.addressLine1.errors %}<div class="invalid-feedback d-block small">{{ form.addressLine1.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-md-6">
+        <label class="form-label fw-medium" for="{{ form.addressLine2.id_for_label }}">Address line 2 <span class="text-secondary fw-normal small">(optional)</span></label>
+        {{ form.addressLine2 }}
+        {% if form.addressLine2.errors %}<div class="invalid-feedback d-block small">{{ form.addressLine2.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-md-6">
+        <label class="form-label fw-medium" for="{{ form.addressLine3.id_for_label }}">Address line 3 <span class="text-secondary fw-normal small">(optional)</span></label>
+        {{ form.addressLine3 }}
+        {% if form.addressLine3.errors %}<div class="invalid-feedback d-block small">{{ form.addressLine3.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label fw-medium" for="{{ form.town.id_for_label }}">Town <span class="text-secondary fw-normal small">(optional)</span></label>
+        {{ form.town }}
+        {% if form.town.errors %}<div class="invalid-feedback d-block small">{{ form.town.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label fw-medium" for="{{ form.city.id_for_label }}">City</label>
+        {{ form.city }}
+        {% if form.city.errors %}<div class="invalid-feedback d-block small">{{ form.city.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label fw-medium" for="{{ form.county.id_for_label }}">County <span class="text-secondary fw-normal small">(optional)</span></label>
+        {{ form.county }}
+        {% if form.county.errors %}<div class="invalid-feedback d-block small">{{ form.county.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label fw-medium" for="{{ form.state.id_for_label }}">State / region <span class="text-secondary fw-normal small">(optional)</span></label>
+        {{ form.state }}
+        {% if form.state.errors %}<div class="invalid-feedback d-block small">{{ form.state.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label fw-medium" for="{{ form.postcode.id_for_label }}">Postcode</label>
+        {{ form.postcode }}
+        {% if form.postcode.errors %}<div class="invalid-feedback d-block small">{{ form.postcode.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label fw-medium" for="{{ form.country.id_for_label }}">Country</label>
+        {{ form.country }}
+        {% if form.country.errors %}<div class="invalid-feedback d-block small">{{ form.country.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-md-6">
+        <label class="form-label fw-medium" for="{{ form.type.id_for_label }}">Address type</label>
+        {{ form.type }}
+        {% if form.type.errors %}<div class="invalid-feedback d-block small">{{ form.type.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-md-6">
+        <label class="form-label fw-medium" for="{{ form.deliveryInstructions.id_for_label }}">Delivery instructions <span class="text-secondary fw-normal small">(optional)</span></label>
+        {{ form.deliveryInstructions }}
+        {% if form.deliveryInstructions.errors %}<div class="invalid-feedback d-block small">{{ form.deliveryInstructions.errors|striptags }}</div>{% endif %}
+    </div>
+    <div class="col-12">
+        <div class="form-check form-switch">
+            {{ form.isPrimary }}
+            <label class="form-check-label" for="{{ form.isPrimary.id_for_label }}">Set as default address</label>
+        </div>
+        {% if form.isPrimary.errors %}<div class="invalid-feedback d-block small">{{ form.isPrimary.errors|striptags }}</div>{% endif %}
+    </div>
+</div>
