@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Wishlist{% endblock %}
+
+{% block extra_head %}
+<style>
+  .wishlist-page {
+    --wl-accent: #2563eb;
+    --wl-accent-soft: rgba(37, 99, 235, 0.08);
+    --wl-surface: #f8fafc;
+    --wl-card-border: rgba(15, 23, 42, 0.08);
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+  .wishlist-page .panel {
+    border: 1px solid var(--wl-card-border);
+    border-radius: 1rem;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  }
+  .wishlist-page .panel-head {
+    background: linear-gradient(180deg, var(--wl-accent-soft) 0%, #fff 100%);
+    border-bottom: 1px solid var(--wl-card-border);
+    padding: 1.1rem 1.35rem;
+  }
+  .wishlist-page .panel-body {
+    padding: 1.1rem 1.35rem;
+  }
+  .wishlist-page .item-row + .item-row {
+    border-top: 1px solid var(--wl-card-border);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wishlist-page container-fluid px-2 px-md-3">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small mb-0">
+      <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Wishlist</li>
+    </ol>
+  </nav>
+
+  <div class="panel">
+    <div class="panel-head d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div>
+        <h1 class="h5 mb-0 fw-semibold text-dark">
+          <i class="fa-regular fa-heart text-primary me-2"></i>Wishlist
+        </h1>
+        <div class="text-secondary small mt-1">{{ items|length }} item{{ items|length|pluralize }}</div>
+      </div>
+      <form method="post" action="{% url 'accounts:wishlist-clear' %}">
+        {% csrf_token %}
+        <button class="btn btn-outline-danger" type="submit" {% if not items %}disabled{% endif %}>
+          Clear wishlist
+        </button>
+      </form>
+    </div>
+
+    <div class="panel-body p-0">
+      {% if items %}
+        {% for it in items %}
+          <div class="item-row p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex flex-column">
+              <a class="fw-semibold text-decoration-none text-dark" href="{% url 'catalog:product-detail' it.product.slug %}">
+                {{ it.product.title }}
+              </a>
+              <div class="text-secondary small">
+                {{ it.product.brand|default:'—' }}{% if it.product.category %} · {{ it.product.category }}{% endif %}
+                · <span class="text-uppercase">{{ it.product.currency }}</span> {{ it.product.price }}
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <a class="btn btn-outline-primary" href="{% url 'catalog:product-detail' it.product.slug %}">
+                View
+              </a>
+              <form method="post" action="{% url 'accounts:wishlist-remove' it.product.slug %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'accounts:wishlist' %}">
+                <button class="btn btn-outline-danger" type="submit">Remove</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="p-4 text-center text-secondary">
+          Your wishlist is empty. Browse products and add some favourites.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

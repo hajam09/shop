@@ -1,0 +1,109 @@
+{% extends 'core/base.html' %}
+{% load core_tags %}
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-3" style="max-width: 1040px;">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Search</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+        <div>
+            <h1 class="h5 mb-1 fw-semibold text-dark">
+                <i class="fa-solid fa-magnifying-glass text-primary me-2"></i>Product search
+            </h1>
+            <p class="text-secondary small mb-0">
+                {% if q %}
+                    Showing {{ total_count }} result{{ total_count|pluralize }} for “{{ q }}”.
+                {% else %}
+                    Enter a search term to find products.
+                {% endif %}
+            </p>
+        </div>
+
+        <form method="get" action="{% url 'catalog:product-search' %}" class="d-flex gap-2">
+            <input type="search" class="form-control" name="q" value="{{ q }}" placeholder="Search title, brand, SKU…"
+                   style="min-width: min(520px, 75vw);" />
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+    </div>
+
+    {% if products %}
+        <div class="row g-3">
+            {% for p in products %}
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="ratio ratio-1x1 bg-light rounded-top overflow-hidden">
+                            <a href="{% url 'catalog:product-detail' p.slug %}" class="d-block w-100 h-100">
+                                <img src="{{ p.primaryImageUrl }}" alt="{{ p.title }}" class="w-100 h-100" style="object-fit: cover;">
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div class="text-truncate">
+                                    <div class="small text-secondary text-truncate">
+                                        {{ p.brand|default:'—' }}{% if p.category %} · {{ p.category }}{% endif %}
+                                    </div>
+                                    <a class="fw-semibold lh-sm text-decoration-none text-dark"
+                                       href="{% url 'catalog:product-detail' p.slug %}"
+                                       style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                                        {{ p.title }}
+                                    </a>
+                                </div>
+                                {% if p.isFeatured %}
+                                    <span class="badge text-bg-warning">Featured</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="mt-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold">
+                                        <span class="text-secondary small">{{ p.currency }}</span> {{ p.price }}
+                                    </div>
+                                    {% if p.compareAtPrice %}
+                                        <div class="small text-secondary text-decoration-line-through">
+                                            {{ p.currency }} {{ p.compareAtPrice }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="text-end">
+                                    {% if p.isDigital %}
+                                        <span class="badge text-bg-info">Digital</span>
+                                    {% elif p.stockStatus == 'IN_STOCK' %}
+                                        <span class="badge text-bg-success">In stock</span>
+                                    {% else %}
+                                        <span class="badge text-bg-secondary">Out</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mt-2 small text-secondary">
+                                SKU: <code class="small">{{ p.sku }}</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-5">
+            {% paginationComponent request page_obj %}
+        </div>
+
+
+    {% else %}
+        <div class="alert alert-light border">
+            {% if q %}
+                No products found for “{{ q }}”.
+            {% else %}
+                Try searching for something like “SSD”, “Weber”, “Office”, or “Air Fryer”.
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

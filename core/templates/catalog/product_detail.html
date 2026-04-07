@@ -1,0 +1,175 @@
+{% extends 'core/base.html' %}
+{% load core_tags %}
+
+{% block title %}{{ product.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-3" style="max-width: 1040px;">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item"><a class="text-decoration-none" href="/">Home</a></li>
+            <li class="breadcrumb-item"><a class="text-decoration-none" href="{% url 'catalog:product-search' %}">Catalog</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.title|truncatechars:40 }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="ratio ratio-1x1 bg-light rounded-top overflow-hidden">
+                    <img src="{{ primary_image_url }}" alt="{{ product.title }}" class="w-100 h-100" style="object-fit: cover;">
+                </div>
+                {% if images %}
+                    <div class="card-body pt-3">
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for img in images|slice:":6" %}
+                                <img src="{{ img.getImage }}" alt="{{ img.altText|default:product.title }}"
+                                     width="56" height="56" class="rounded border bg-light"
+                                     style="object-fit: cover;">
+                            {% endfor %}
+                        </div>
+                        <div class="small text-secondary mt-2">Images are demo placeholders.</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+                        <div>
+                            <div class="text-secondary small">
+                                {{ product.brand|default:'—' }}{% if product.category %} · {{ product.category }}{% endif %}
+                            </div>
+                            <h1 class="h4 fw-semibold mb-2">{{ product.title }}</h1>
+                        </div>
+                        {% if product.isFeatured %}
+                            <span class="badge text-bg-warning">Featured</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        {% if product.isDigital %}
+                            <span class="badge text-bg-info">Digital</span>
+                        {% endif %}
+                        {% if product.stockStatus == 'IN_STOCK' %}
+                            <span class="badge text-bg-success">In stock</span>
+                        {% else %}
+                            <span class="badge text-bg-secondary">Out of stock</span>
+                        {% endif %}
+                        <span class="text-secondary small">SKU: <code class="small">{{ product.sku }}</code></span>
+                    </div>
+
+                    <div class="p-3 rounded-3 border bg-light-subtle mb-3">
+                        <div class="d-flex justify-content-between align-items-end flex-wrap gap-2">
+                            <div>
+                                <div class="text-secondary small">Price</div>
+                                <div class="h4 mb-0 fw-bold">
+                                    <span class="text-secondary small">{{ product.currency }}</span> {{ product.price }}
+                                </div>
+                                {% if product.compareAtPrice %}
+                                    <div class="text-secondary small text-decoration-line-through">
+                                        {{ product.currency }} {{ product.compareAtPrice }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% if product.deliveryCharge and not product.isDigital %}
+                                <div class="text-end">
+                                    <div class="text-secondary small">Delivery</div>
+                                    <div class="fw-semibold">{{ product.currency }} {{ product.deliveryCharge }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <form method="post" action="{% url 'catalog:add-to-cart' product.slug %}" class="d-grid gap-3">
+                        {% csrf_token %}
+                        {% if has_variants %}
+                            <div>
+                                <label class="form-label" for="variant">Variant</label>
+                                <select class="form-select" id="variant" name="variant" required>
+                                    <option value="" selected disabled>Select a variant…</option>
+                                    {% for v in variants %}
+                                        <option value="{{ v.pk }}">
+                                            {{ v.name }}{% if v.color %} · {{ v.color }}{% endif %}{% if v.size %} · {{ v.size }}{% endif %}
+                                            {% if v.price %} — {{ product.currency }} {{ v.price }}{% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+
+                        <div class="row g-2 align-items-end">
+                            <div class="col-6 col-md-4">
+                                <label class="form-label" for="quantity">Qty</label>
+                                <input class="form-control" id="quantity" name="quantity" type="number" min="1" max="999" value="1">
+                            </div>
+                            <div class="col-6 col-md-8 d-grid">
+                                <button class="btn btn-primary btn-lg" type="submit">
+                                    <i class="fa-solid fa-cart-plus me-2"></i>Add to cart
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <form method="post" action="{% url 'accounts:wishlist-add' product.slug %}" class="mt-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'catalog:product-detail' product.slug %}">
+                        <button class="btn btn-outline-danger w-100" type="submit">
+                            <i class="fa-regular fa-heart me-2"></i>Add to wishlist
+                        </button>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <h2 class="h6 fw-semibold mb-2">Description</h2>
+                            <div class="text-secondary">
+                                {{ product.description|default:"No description yet." }}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h2 class="h6 fw-semibold mb-2">Details</h2>
+                            <div class="row g-2 small">
+                                <div class="col-6"><span class="text-secondary">Condition:</span> {{ product.get_condition_display }}</div>
+                                <div class="col-6"><span class="text-secondary">Stock:</span> {{ product.stock }}</div>
+                                <div class="col-6"><span class="text-secondary">Min order:</span> {{ product.minOrderQuantity }}</div>
+                                <div class="col-6"><span class="text-secondary">Max order:</span> {{ product.maxOrderQuantity|default:"—" }}</div>
+                                <div class="col-6"><span class="text-secondary">Tax rate:</span> {{ product.taxRate }}%</div>
+                                <div class="col-6"><span class="text-secondary">Weight:</span> {{ product.weightGrams|default:"—" }}{% if product.weightGrams %} g{% endif %}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if related_products %}
+        <div class="mt-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h2 class="h6 fw-semibold mb-0">You might also like</h2>
+                <a class="small text-decoration-none" href="{% url 'catalog:product-search' %}?q={{ product.brand|urlencode }}">More from this brand</a>
+            </div>
+            <div class="row g-3">
+                {% for p in related_products %}
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <a class="card h-100 border-0 shadow-sm text-decoration-none" href="{% url 'catalog:product-detail' p.slug %}">
+                            <div class="card-body">
+                                <div class="small text-secondary">{{ p.brand|default:'—' }}{% if p.category %} · {{ p.category }}{% endif %}</div>
+                                <div class="fw-semibold text-dark">{{ p.title|truncatechars:72 }}</div>
+                                <div class="mt-2 fw-bold text-dark">
+                                    <span class="text-secondary small">{{ p.currency }}</span> {{ p.price }}
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

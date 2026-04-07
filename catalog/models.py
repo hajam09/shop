@@ -46,6 +46,8 @@ class Product(BaseModel):
             models.Index(fields=['category', 'brand']),
             models.Index(fields=['stockStatus']),
         ]
+        verbose_name = 'Product'
+        verbose_name_plural = 'Product'
 
 
 class ProductImage(BaseModel):
@@ -56,7 +58,16 @@ class ProductImage(BaseModel):
     isPrimary = models.BooleanField(default=False)
 
     class Meta:
-        indexes = [models.Index(fields=['product', 'order']), models.Index(fields=['product', 'isPrimary'])]
+        indexes = [
+            models.Index(fields=['product', 'order']),
+            models.Index(fields=['product', 'isPrimary'])
+        ]
+        verbose_name = 'ProductImage'
+        verbose_name_plural = 'ProductImage'
+
+    @property
+    def getImage(self):
+        return 'https://dummyimage.com/1080x1080/'
 
 
 class Category(BaseModel):
@@ -81,7 +92,12 @@ class Category(BaseModel):
         return ' -> '.join(reversed(parts))
 
     class Meta:
-        indexes = [models.Index(fields=['parent', 'sortOrder']), models.Index(fields=['slug'])]
+        indexes = [
+            models.Index(fields=['parent', 'sortOrder']),
+            models.Index(fields=['slug'])
+        ]
+        verbose_name = 'Category'
+        verbose_name_plural = 'Category'
 
 
 class ProductCategory(BaseModel):
@@ -91,12 +107,20 @@ class ProductCategory(BaseModel):
 
     class Meta:
         unique_together = ('product', 'category')
-        indexes = [models.Index(fields=['category', 'isPrimary'])]
+        indexes = [
+            models.Index(fields=['category', 'isPrimary'])
+        ]
+        verbose_name = 'ProductCategory'
+        verbose_name_plural = 'ProductCategory'
 
 
 class ProductTag(BaseModel):
     name = models.CharField(max_length=64, unique=True)
     slug = models.SlugField(max_length=80, unique=True)
+
+    class Meta:
+        verbose_name = 'ProductTag'
+        verbose_name_plural = 'ProductTag'
 
 
 class ProductTagMap(BaseModel):
@@ -105,7 +129,11 @@ class ProductTagMap(BaseModel):
 
     class Meta:
         unique_together = ('product', 'tag')
-        indexes = [models.Index(fields=['tag', 'product'])]
+        indexes = [
+            models.Index(fields=['tag', 'product'])
+        ]
+        verbose_name = 'ProductTagMap'
+        verbose_name_plural = 'ProductTagMap'
 
 
 class ProductVariant(BaseModel):
@@ -121,7 +149,12 @@ class ProductVariant(BaseModel):
     isActive = models.BooleanField(default=True)
 
     class Meta:
-        indexes = [models.Index(fields=['product', 'isActive']), models.Index(fields=['product', 'stock'])]
+        indexes = [
+            models.Index(fields=['product', 'isActive']),
+            models.Index(fields=['product', 'stock'])
+        ]
+        verbose_name = 'ProductVariant'
+        verbose_name_plural = 'ProductVariant'
 
 
 class ProductVideo(BaseModel):
@@ -131,7 +164,11 @@ class ProductVideo(BaseModel):
     order = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
-        indexes = [models.Index(fields=['product', 'order'])]
+        indexes = [
+            models.Index(fields=['product', 'order'])
+        ]
+        verbose_name = 'ProductVideo'
+        verbose_name_plural = 'ProductVideo'
 
 
 class ProductComparison(BaseModel):
@@ -139,7 +176,11 @@ class ProductComparison(BaseModel):
     name = models.CharField(max_length=100, default='Default')
 
     class Meta:
-        indexes = [models.Index(fields=['user', 'name'])]
+        indexes = [
+            models.Index(fields=['user', 'name'])
+        ]
+        verbose_name = 'ProductComparison'
+        verbose_name_plural = 'ProductComparison'
 
 
 class ProductComparisonItem(BaseModel):

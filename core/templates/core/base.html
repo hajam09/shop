@@ -1,4 +1,5 @@
 {% load static %}
+{% load core_tags %}
 <!DOCTYPE html>
 <html lang='en-GB'>
 <head>
@@ -20,6 +21,99 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container-fluid px-3 px-lg-4">
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
+            <i class="fa-solid fa-bag-shopping text-primary"></i>
+            <span>Shop</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        Categories
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Electronics</a></li>
+                        <li><a class="dropdown-item" href="#">Fashion</a></li>
+                        <li><a class="dropdown-item" href="#">Home & Living</a></li>
+                        <li><a class="dropdown-item" href="#">Beauty</a></li>
+                        <li><a class="dropdown-item" href="#">Sports</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="#">New arrivals</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Deals</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Orders</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Help</a></li>
+            </ul>
+
+            <form class="d-flex flex-grow-1 flex-lg-grow-0 mx-lg-3 my-2 my-lg-0" role="search" method="get"
+                  action="{% url 'catalog:product-search' %}">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-secondary"></i></span>
+                    <input class="form-control" type="search" name="q" placeholder="Search products…" aria-label="Search">
+                </div>
+            </form>
+
+            <ul class="navbar-nav ms-lg-2 align-items-lg-center gap-lg-1">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-regular fa-user"></i>
+                        <span class="d-lg-none">Account</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        {% if request.user.is_authenticated %}
+                            <li><h6 class="dropdown-header">{{ request.user.username }}</h6></li>
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Addresses</a></li>
+                            <li><a class="dropdown-item" href="#">Payment methods</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#">Log out</a></li>
+                        {% else %}
+                            <li><a class="dropdown-item" href="/admin/login/">Log in</a></li>
+                            <li><a class="dropdown-item" href="#">Create account</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center gap-2 position-relative"
+                       href="{% url 'accounts:wishlist' %}" title="Wishlist">
+                        <i class="fa-regular fa-heart"></i>
+                        {% wishlistItemCount request as wl_count %}
+                        {% if wl_count %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger">
+                                {{ wl_count }}
+                            </span>
+                        {% endif %}
+                        <span class="d-lg-none">Wishlist</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center gap-2 position-relative"
+                       href="{% url 'checkout:cart' %}" title="Cart">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        {% cartItemCount request as cart_count %}
+                        {% if cart_count %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger">
+                                {{ cart_count }}
+                            </span>
+                        {% endif %}
+                        <span class="d-lg-none">Cart</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
 <div class='content p-4'>
     {% if messages %}
         {% for msg in messages %}

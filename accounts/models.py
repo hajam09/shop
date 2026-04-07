@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 
 from accounts.choices import AddressType, Country, LoyaltyTransactionType, ReviewModerationStatus, UserRole
+from catalog.models import Product, ProductVariant
 from core.models import BaseModel
 
 
@@ -25,7 +26,12 @@ class Address(BaseModel):
     deliveryInstructions = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        indexes = [models.Index(fields=['user', 'type']), models.Index(fields=['postcode', 'country'])]
+        indexes = [
+            models.Index(fields=['user', 'type']),
+            models.Index(fields=['postcode', 'country'])
+        ]
+        verbose_name = 'Address'
+        verbose_name_plural = 'Address'
 
 
 class UserProfile(BaseModel):
@@ -82,17 +88,25 @@ class Wishlist(BaseModel):
     isDefault = models.BooleanField(default=False)
 
     class Meta:
-        indexes = [models.Index(fields=['user', 'isDefault'])]
+        indexes = [
+            models.Index(fields=['user', 'isDefault'])
+        ]
+        verbose_name = 'Wishlist'
+        verbose_name_plural = 'Wishlist'
 
 
 class WishlistItem(BaseModel):
     wishlist = models.ForeignKey(Wishlist, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey('catalog.Product', on_delete=models.CASCADE, related_name='wishlistedItems')
-    variant = models.ForeignKey('catalog.ProductVariant', on_delete=models.SET_NULL, blank=True, null=True, related_name='wishlistedItems')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='wishlistedItems')
+    variant = models.ForeignKey(ProductVariant, on_delete=models.SET_NULL, blank=True, null=True, related_name='wishlistedItems')
 
     class Meta:
         unique_together = ('wishlist', 'product', 'variant')
-        indexes = [models.Index(fields=['product'])]
+        indexes = [
+            models.Index(fields=['product'])
+        ]
+        verbose_name = 'WishlistItem'
+        verbose_name_plural = 'WishlistItem'
 
 
 class Review(BaseModel):
