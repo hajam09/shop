@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Payment methods{% endblock %}
+
+{% block extra_head %}
+{% include 'payments/includes/payment_method_page_styles.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="pm-page container-fluid px-2 px-md-3">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item active" aria-current="page">Payments</li>
+            <li class="breadcrumb-item active" aria-current="page">Payment methods</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex flex-column gap-4">
+        <div class="panel">
+            <div class="panel-head">
+                <h2 class="h5 mb-0 fw-semibold text-dark">
+                    <i class="fa-solid fa-credit-card text-primary me-2"></i>New payment method
+                </h2>
+                <p class="text-secondary small mb-0 mt-2">Card number and CVV are stored encrypted. Your first saved card is set as primary automatically.</p>
+            </div>
+            <div class="panel-body">
+                <form method="post" action="" novalidate>
+                    {% csrf_token %}
+                    {% include 'payments/includes/payment_method_form_fields.html' with submit_label='Create payment method' %}
+                </form>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <h2 class="h4 mb-0 fw-semibold text-dark">
+                    <i class="fa-solid fa-wallet text-primary me-2"></i>Your payment methods
+                </h2>
+                <p class="text-secondary small mb-0 mt-2">Card number and CVV are never shown after save; only name and expiry appear here.</p>
+            </div>
+            <div class="panel-body p-0">
+                {% if payment_methods %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th scope="col" class="ps-4">Name</th>
+                                <th scope="col">Card</th>
+                                <th scope="col">Expires</th>
+                                <th scope="col" class="text-center">Primary</th>
+                                <th scope="col" class="text-center">Active</th>
+                                <th scope="col" class="pe-4 text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for pm in payment_methods %}
+                                <tr>
+                                    <td class="ps-4">{{ pm.name }}</td>
+                                    <td><code class="small">{{ pm.maskedCardNumber }}</code></td>
+                                    <td>{{ pm.expiration|date:'M Y' }}</td>
+                                    <td class="text-center">
+                                        {% if pm.isPrimary %}
+                                            <span class="badge text-bg-primary">Yes</span>
+                                        {% else %}
+                                            <span class="badge text-bg-secondary">No</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if pm.isActive %}
+                                            <span class="badge text-bg-success">Yes</span>
+                                        {% else %}
+                                            <span class="badge text-bg-secondary">No</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <div class="d-inline-flex gap-1 flex-wrap justify-content-end">
+                                            <a href="{% url 'payments:payment-method-edit' pm.pk %}"
+                                               class="btn btn-sm btn-outline-primary rounded-pill px-3">Edit</a>
+                                            <a href="{% url 'payments:payment-method-delete' pm.pk %}"
+                                               class="btn btn-sm btn-outline-danger rounded-pill px-3">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-secondary px-4 py-5 mb-0 text-center">No payment methods yet. Add one using the form above.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

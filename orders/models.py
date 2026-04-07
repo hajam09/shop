@@ -4,9 +4,12 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
+from accounts.models import Address
+from catalog.models import Product
 from core.models import BaseModel
 from orders.choices import InvoiceStatus, ReturnStatus, Status
 from payments.choices import Currency
+from payments.models import PaymentMethod
 
 
 def generateOrderNumber():
@@ -14,11 +17,11 @@ def generateOrderNumber():
 
 
 class Order(BaseModel):
-    product = models.ForeignKey('catalog.Product', on_delete=models.PROTECT, related_name='productOrders')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='productOrders')
     buyer = models.ForeignKey(User, on_delete=models.PROTECT, related_name='buyerOrders')
-    paymentMethod = models.ForeignKey('payments.PaymentMethod', on_delete=models.SET_NULL, related_name='orders', blank=True, null=True)
-    shippingAddress = models.ForeignKey('accounts.Address', on_delete=models.SET_NULL, related_name='shippingOrders', blank=True, null=True)
-    billingAddress = models.ForeignKey('accounts.Address', on_delete=models.SET_NULL, related_name='billingOrders', blank=True, null=True)
+    paymentMethod = models.ForeignKey(PaymentMethod, on_delete=models.SET_NULL, related_name='orders', blank=True, null=True)
+    shippingAddress = models.ForeignKey(Address, on_delete=models.SET_NULL, related_name='shippingOrders', blank=True, null=True)
+    billingAddress = models.ForeignKey(Address, on_delete=models.SET_NULL, related_name='billingOrders', blank=True, null=True)
     status = models.CharField(max_length=32, choices=Status.choices, default=Status.ORDERED)
     currency = models.CharField(max_length=3, choices=Currency.choices, default=Currency.GBP)
     unitPrice = models.DecimalField(max_digits=12, decimal_places=2)

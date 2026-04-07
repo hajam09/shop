@@ -9,12 +9,9 @@ from payments.choices import Currency, PaymentProvider, PaymentStatus, PayoutSta
 
 class PaymentMethod(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='paymentMethods')
-    provider = models.CharField(max_length=32, choices=PaymentProvider.choices, default=PaymentProvider.STRIPE)
-    number = models.CharField(max_length=256)
-    cvv = models.CharField(max_length=256)
+    number = models.CharField(max_length=16)
+    cvv = models.CharField(max_length=3)
     name = models.CharField(max_length=128)
-    cardLast4 = models.CharField(max_length=4, blank=True, null=True)
-    cardBrand = models.CharField(max_length=32, blank=True, null=True)
     billingZip = models.CharField(max_length=20, blank=True, null=True)
     expiration = models.DateField()
     isPrimary = models.BooleanField(default=False)
@@ -23,7 +20,6 @@ class PaymentMethod(BaseModel):
     def setCardNumber(self, number):
         fernet = Fernet(bytes(config('FERNET_KEY', cast=str), 'utf-8'))
         self.number = fernet.encrypt(bytes(number, 'utf-8')).decode('utf-8')
-        self.cardLast4 = number[-4:] if number else None
 
     @property
     def getCardNumber(self):
@@ -39,11 +35,24 @@ class PaymentMethod(BaseModel):
         fernet = Fernet(bytes(config('FERNET_KEY', cast=str), 'utf-8'))
         return fernet.decrypt(bytes(self.cvv, 'utf-8')).decode('utf-8')
 
+    @property
+    def maskedCardNumber(self) -> str:
+        """
+        Display-only masked representation like: **** **** **** 1234
+        """
+        try:
+            digits = ''.join(ch for ch in (self.getCardNumber or '') if ch.isdigit())
+        except Exception:
+            digits = ''
+        last4 = digits[-4:] if len(digits) >= 4 else digits
+        if not last4:
+            return '—'
+        return f'**** **** **** {last4}'
+
     class Meta:
         indexes = [
             models.Index(fields=['user', 'isPrimary']),
             models.Index(fields=['user', 'isActive']),
-            models.Index(fields=['provider', 'isActive']),
         ]
 
 
